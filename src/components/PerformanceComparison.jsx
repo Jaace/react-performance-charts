@@ -16,14 +16,49 @@ const PerformanceComparison = () => {
     0, 0.1, 0.1, 0, 0, 0.1
   ];
 
-  const beforeData = [...beforeMount, ...beforeUpdate];
-  const afterData = [...afterMount, ...afterUpdate];
+  // Create data array with state information
+  const data = [];
 
-  const data = beforeData.map((value, index) => ({
-    measurement: index + 1,
-    before: value,
-    after: index < afterData.length ? afterData[index] : null,
-  }));
+  // Add mount measurements
+  beforeMount.forEach((value, index) => {
+    data.push({
+      measurement: index + 1,
+      before: value,
+      beforeState: 'mount',
+      after: afterMount[index],
+      afterState: 'mount'
+    });
+  });
+
+  // Add update measurements
+  beforeUpdate.forEach((value, index) => {
+    data.push({
+      measurement: beforeMount.length + index + 1,
+      before: value,
+      beforeState: 'update',
+      after: index < afterUpdate.length ? afterUpdate[index] : null,
+      afterState: index < afterUpdate.length ? 'update' : null
+    });
+  });
+
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length > 0) {
+      return (
+        <div className="bg-white p-4 border rounded shadow">
+          <p className="text-sm font-medium">Measurement {label}</p>
+          {payload.map((entry, index) => (
+            entry.value !== null && (
+              <p key={index} style={{ color: entry.color }} className="text-sm">
+                {entry.name}: {entry.value}ms ({entry.payload[`${entry.name.toLowerCase()}State`]})
+              </p>
+            )
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <Card className="w-full max-w-[90vw] mx-auto bg-white">
@@ -46,7 +81,7 @@ const PerformanceComparison = () => {
                 label={{ value: 'Time (ms)', angle: -90, position: 'insideLeft' }}
                 domain={[0, 'auto']}
               />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="bottom" height={36} />
               <Line
                 type="monotone"
@@ -70,8 +105,8 @@ const PerformanceComparison = () => {
         <div className="mt-8 text-sm text-gray-600">
           <p>Key Observations:</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Before: {beforeData.length} total measurements ({beforeMount.length} mount + {beforeUpdate.length} update)</li>
-            <li>After: {afterData.length} total measurements ({afterMount.length} mount + {afterUpdate.length} update)</li>
+            <li>Before: {beforeMount.length + beforeUpdate.length} total measurements ({beforeMount.length} mount + {beforeUpdate.length} update)</li>
+            <li>After: {afterMount.length + afterUpdate.length} total measurements ({afterMount.length} mount + {afterUpdate.length} update)</li>
             <li>Mount times are similar but slightly more consistent in the &quot;after&quot; measurements</li>
             <li>Update operations show improvement with fewer overall updates needed</li>
           </ul>
