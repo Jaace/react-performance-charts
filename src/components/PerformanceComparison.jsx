@@ -1,64 +1,30 @@
+import PropTypes from 'prop-types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { performanceData, transformDataForChart, generateStats } from './PerformanceData';
 
-const PerformanceComparison = () => {
-  const beforeMount = [1.5, 0.7, 0.6, 1.1, 0.7, 0.6];
-  const beforeUpdate = [
-    0.5, 0.4, 0.3, 0.4, 0.3, 0.3,
-    0.3, 0.2, 0.2, 0.2, 0.1, 0.1,
-    0, 0, 0, 0, 0, 0.1,
-    0.4, 0.3, 0.2, 0.2, 0.2, 0.1
-  ];
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length > 0) {
+    return (
+      <div className="bg-white p-4 border rounded shadow">
+        <p className="text-sm font-medium">Measurement {label}</p>
+        {payload.map((entry, index) => (
+          entry.value !== null && (
+            <p key={index} style={{ color: entry.color }} className="text-sm">
+              {entry.name}: {entry.value}ms ({entry.payload[`${entry.name.toLowerCase()}State`]})
+            </p>
+          )
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
-  const afterMount = [1.5, 0.6, 0.6, 0.6, 0.6, 0.5];
-  const afterUpdate = [
-    0.6, 0.4, 0.4, 0.3, 0.3, 0.2,
-    0, 0.1, 0.1, 0, 0, 0.1
-  ];
-
-  // Create data array with state information
-  const data = [];
-
-  // Add mount measurements
-  beforeMount.forEach((value, index) => {
-    data.push({
-      measurement: index + 1,
-      before: value,
-      beforeState: 'mount',
-      after: afterMount[index],
-      afterState: 'mount'
-    });
-  });
-
-  // Add update measurements
-  beforeUpdate.forEach((value, index) => {
-    data.push({
-      measurement: beforeMount.length + index + 1,
-      before: value,
-      beforeState: 'update',
-      after: index < afterUpdate.length ? afterUpdate[index] : null,
-      afterState: index < afterUpdate.length ? 'update' : null
-    });
-  });
-
-  // Custom tooltip component
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length > 0) {
-      return (
-        <div className="bg-white p-4 border rounded shadow">
-          <p className="text-sm font-medium">Measurement {label}</p>
-          {payload.map((entry, index) => (
-            entry.value !== null && (
-              <p key={index} style={{ color: entry.color }} className="text-sm">
-                {entry.name}: {entry.value}ms ({entry.payload[`${entry.name.toLowerCase()}State`]})
-              </p>
-            )
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+const PerformanceComparison = ({ dataSetKey = 'desktop' }) => {
+  const dataSet = performanceData[dataSetKey];
+  const data = transformDataForChart(dataSet);
+  const { observations } = generateStats(dataSet);
 
   return (
     <Card className="w-full max-w-[90vw] mx-auto bg-white">
@@ -105,15 +71,38 @@ const PerformanceComparison = () => {
         <div className="mt-8 text-sm text-gray-600">
           <p>Key Observations:</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Before: {beforeMount.length + beforeUpdate.length} total measurements ({beforeMount.length} mount + {beforeUpdate.length} update)</li>
-            <li>After: {afterMount.length + afterUpdate.length} total measurements ({afterMount.length} mount + {afterUpdate.length} update)</li>
-            <li>Mount times are similar but slightly more consistent in the &quot;after&quot; measurements</li>
-            <li>Update operations show improvement with fewer overall updates needed</li>
+            {observations.map((observation, index) => (
+              <li key={index}>{observation}</li>
+            ))}
           </ul>
         </div>
       </CardContent>
     </Card>
   );
+};
+
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.number,
+      name: PropTypes.string,
+      color: PropTypes.string,
+      payload: PropTypes.shape({
+        beforeState: PropTypes.string,
+        afterState: PropTypes.string
+      })
+    })
+  ),
+  label: PropTypes.number
+};
+
+PerformanceComparison.propTypes = {
+  dataSetKey: PropTypes.string
+};
+
+PerformanceComparison.defaultProps = {
+  dataSetKey: 'desktop'
 };
 
 export default PerformanceComparison;
