@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { performanceData, transformDataForChart, generateStats } from './PerformanceData';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length > 0) {
@@ -21,15 +23,43 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const PerformanceComparison = ({ dataSetKey = 'desktop' }) => {
-  const dataSet = performanceData[dataSetKey];
+const PerformanceComparison = () => {
+  const [dataSetKey, setDataSetKey] = useState('desktop');
+  const { testId = 'test1' } = useParams(); // Get testId from URL
+
+  const dataSet = performanceData[testId][dataSetKey];
   const data = transformDataForChart(dataSet);
   const { observations } = generateStats(dataSet);
 
+
   return (
     <Card className="w-full max-w-[90vw] mx-auto bg-white">
-      <CardHeader>
+      <CardHeader className="flex flex-col space-y-4">
         <CardTitle>Performance Comparison: Before vs After</CardTitle>
+        <div className="flex items-center gap-6">
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500"
+              name="dataset"
+              value="desktop"
+              checked={dataSetKey === 'desktop'}
+              onChange={(e) => setDataSetKey(e.target.value)}
+            />
+            <span className="ml-2 text-sm font-medium text-gray-900">Desktop</span>
+          </label>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500"
+              name="dataset"
+              value="mobile"
+              checked={dataSetKey === 'mobile'}
+              onChange={(e) => setDataSetKey(e.target.value)}
+            />
+            <span className="ml-2 text-sm font-medium text-gray-900">Mobile</span>
+          </label>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[500px]">
@@ -95,14 +125,6 @@ CustomTooltip.propTypes = {
     })
   ),
   label: PropTypes.number
-};
-
-PerformanceComparison.propTypes = {
-  dataSetKey: PropTypes.string
-};
-
-PerformanceComparison.defaultProps = {
-  dataSetKey: 'desktop'
 };
 
 export default PerformanceComparison;
