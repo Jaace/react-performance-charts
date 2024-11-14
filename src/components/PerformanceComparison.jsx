@@ -3,7 +3,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { performanceData, transformDataForChart, generateStats } from './PerformanceData';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length > 0) {
@@ -23,9 +22,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const PerformanceComparison = () => {
+const PerformanceComparison = ({ testId = 'test1' }) => {
   const [dataSetKey, setDataSetKey] = useState('desktop');
-  const { testId = 'test1' } = useParams(); // Get testId from URL
 
   const dataSet = performanceData[testId][dataSetKey];
   const data = transformDataForChart(dataSet);
@@ -125,6 +123,14 @@ CustomTooltip.propTypes = {
     })
   ),
   label: PropTypes.number
+};
+
+PerformanceComparison.propTypes = {
+  testId: PropTypes.string
+};
+
+PerformanceComparison.defaultProps = {
+  testId: 'test1'
 };
 
 export default PerformanceComparison;

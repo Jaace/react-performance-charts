@@ -5,7 +5,6 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
-        {/* Navigation */}
         <nav className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-start h-16">
@@ -34,17 +33,15 @@ const App = () => {
                 >
                   Test 2
                 </NavLink>
-                {/* Add more NavLinks as needed */}
               </div>
             </div>
           </div>
         </nav>
 
-        {/* Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
-            <Route path="/test1" element={<PerformanceComparison />} />
-            <Route path="/test2" element={<div>Test 2 Component</div>} />
+            <Route path="/test1" element={<PerformanceComparison testId="test1" />} />
+            <Route path="/test2" element={<PerformanceComparison testId="test2" />} />
             <Route path="/" element={<Navigate to="/test1" replace />} />
           </Routes>
         </main>

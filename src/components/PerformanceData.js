@@ -49,8 +49,22 @@ export const performanceData = {
   },
   test2: {
     desktop: {
-      before: { mount: [], update: [] },
-      after: { mount: [], update: [] }
+      before: {
+        mount: [1.5, 0.7, 0.6, 0.6, 0.7, 0.4],
+        update: [
+          0.4, 0.3, 0.3, 0.5, 0.3, 0.3,
+          0.4, 0.2, 0.2, 0.2, 0.1, 0.3,
+          0, 0, 0, 0, 0, 0.1,
+          0.4, 0.3, 0.3, 0.1, 0.2, 0.2
+        ]
+      },
+      after: {
+        mount: [1.9, 0.7, 0.7, 0.5, 0.6, 0.6],
+        update: [
+          0.4, 0.4, 0.4, 0.4, 0.3, 0.1,
+          0.1, 0, 0.2, 0, 0, 0.1
+        ]
+      }
     },
     mobile: {
       before: { mount: [], update: [] },
