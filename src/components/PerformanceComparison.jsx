@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import PerformanceStats from './PerformanceStats';
 import { performanceData, transformDataForChart, generateStats } from './PerformanceData';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
@@ -119,6 +120,7 @@ const PerformanceComparison = ({ testId = 'test1' }) => {
             </label>
           </div>
         </CardHeader>
+
         <CardContent>
           <div className="text-sm text-gray-600">
             <p>Key Observations:</p>
@@ -130,6 +132,11 @@ const PerformanceComparison = ({ testId = 'test1' }) => {
           </div>
         </CardContent>
       </Card>
+
+      <PerformanceStats
+        beforeData={performanceData.test1.desktop.before}
+        afterData={performanceData.test1.desktop.after}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(componentData).map(([componentId, componentItems]) => (
